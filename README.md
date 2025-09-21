@@ -36,7 +36,10 @@ A comprehensive garden monitoring system using Raspberry Pi Pico W with sensors 
    ```
 
 4. **Upload files to Pico W**:
-   - Copy `main.py` and `config.py` to your Pico W using Thonny, rshell, or your preferred method
+   - Copy `main.py` and `config.py` to your Pico W using one of the following methods:
+     - **Thonny IDE**: Open files and save them directly to the Pico W
+     - **rshell**: Command-line tool for MicroPython file management
+     - **From Raspberry Pi**: Use `rshell` or `mpremote` (see section below)
 
 5. **Run the sensor script**:
    - The script will automatically start when the Pico W boots
@@ -101,6 +104,78 @@ The Flask server runs on all interfaces (`0.0.0.0`) on port 5000 by default. To 
 ```python
 # In app.py, modify the last line:
 app.run(host='0.0.0.0', port=YOUR_PORT, debug=False)
+```
+
+### Copying Files from Raspberry Pi to Pico W
+
+If you're deploying from a Raspberry Pi, you can use these methods to transfer files to your Pico W:
+
+#### Method 1: Using mpremote (Recommended)
+
+1. **Install mpremote**:
+   ```bash
+   pip install mpremote
+   ```
+
+2. **Connect Pico W via USB** to your Raspberry Pi
+
+3. **Copy files**:
+   ```bash
+   # Navigate to the pico directory
+   cd pico/
+
+   # Copy main.py to the Pico W
+   mpremote cp main.py :main.py
+
+   # Copy your config.py to the Pico W
+   mpremote cp config.py :config.py
+
+   # Verify files were copied
+   mpremote ls
+   ```
+
+4. **Reset the Pico W** to start the new code:
+   ```bash
+   mpremote reset
+   ```
+
+#### Method 2: Using rshell
+
+1. **Install rshell**:
+   ```bash
+   pip install rshell
+   ```
+
+2. **Connect to Pico W**:
+   ```bash
+   rshell -p /dev/ttyACM0
+   ```
+
+3. **Copy files** (within rshell):
+   ```bash
+   cp main.py /pyboard/
+   cp config.py /pyboard/
+   ls /pyboard/
+   ```
+
+4. **Exit rshell and reset**:
+   ```bash
+   exit
+   mpremote reset
+   ```
+
+#### Finding the Correct Serial Port
+
+If `/dev/ttyACM0` doesn't work, find the correct port:
+```bash
+# List USB devices
+lsusb | grep -i pico
+
+# List serial devices
+ls /dev/tty*
+
+# Usually it's one of:
+# /dev/ttyACM0, /dev/ttyACM1, /dev/ttyUSB0, etc.
 ```
 
 ## 📡 API Endpoints

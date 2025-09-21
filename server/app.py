@@ -116,22 +116,20 @@ def get_chart_data():
 
         cursor.execute('''
             SELECT
-                strftime('%Y-%m-%d %H:%M', utc_timestamp) as time,
-                utc_timestamp,
+                strftime('%Y-%m-%d %H:00:00', utc_timestamp) as utc_timestamp,
                 AVG(light) as light,
                 AVG(soil_moisture) as soil_moisture,
                 AVG(temperature) as temperature,
                 AVG(humidity) as humidity
             FROM sensor_readings
             WHERE utc_timestamp >= datetime('now', '-3 days')
-            GROUP BY strftime('%Y-%m-%d %H:%M', utc_timestamp)
+            GROUP BY strftime('%Y-%m-%d %H', utc_timestamp)
             ORDER BY utc_timestamp ASC
         ''')
 
         chart_data = []
         for row in cursor.fetchall():
             chart_data.append({
-                'time': row['time'],
                 'utc_timestamp': row['utc_timestamp'],
                 'light': round(row['light'], 2) if row['light'] else 0,
                 'soil_moisture': round(row['soil_moisture'], 2) if row['soil_moisture'] else 0,

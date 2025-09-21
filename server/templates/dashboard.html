@@ -65,14 +65,14 @@
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Soil Moisture & Light (3 Days)</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Soil Moisture & Light (3 Days - Hourly Averages)</h2>
                 <div class="relative h-64">
                     <canvas id="soilLightChart"></canvas>
                 </div>
             </div>
 
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Temperature & Humidity (3 Days)</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Temperature & Humidity (3 Days - Hourly Averages)</h2>
                 <div class="relative h-64">
                     <canvas id="tempHumidityChart"></canvas>
                 </div>
@@ -351,7 +351,17 @@
                 const labels = data.map(item => {
                     // Parse UTC timestamp and convert to local time
                     const date = new Date(item.utc_timestamp);
-                    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+                    // Show time for today, date+time for other days
+                    if (itemDate.getTime() === today.getTime()) {
+                        return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                    } else {
+                        return date.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' +
+                               date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                    }
                 });
 
                 soilLightChart.data.labels = labels;

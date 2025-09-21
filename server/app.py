@@ -53,30 +53,17 @@ def receive_sensor_data():
             if field not in data:
                 return jsonify({'error': f'Missing field: {field}'}), 400
 
-        # Handle timezone information
-        utc_timestamp = None
-        local_timestamp = None
-        timezone_offset = None
-
-        if 'timestamp' in data:
-            # Convert Unix timestamp to datetime
-            utc_timestamp = datetime.fromtimestamp(data['timestamp'], tz=timezone.utc)
-
-        if 'local_timestamp' in data:
-            # Convert Unix timestamp to datetime
-            local_timestamp = datetime.fromtimestamp(data['local_timestamp'], tz=timezone.utc)
-
-        if 'timezone_offset' in data:
-            timezone_offset = data['timezone_offset']
+        # Store server-side UTC timestamp when data is received
+        server_utc_timestamp = datetime.now(timezone.utc)
 
         # Insert data into database
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute('''
-            INSERT INTO sensor_readings (utc_timestamp, local_timestamp, timezone_offset, light, soil_moisture, temperature, humidity)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (utc_timestamp, local_timestamp, timezone_offset, data['light'], data['soil_moisture'], data['temperature'], data['humidity']))
+            INSERT INTO sensor_readings (utc_timestamp, light, soil_moisture, temperature, humidity)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (server_utc_timestamp, data['light'], data['soil_moisture'], data['temperature'], data['humidity']))
 
         conn.commit()
         conn.close()
@@ -98,27 +85,15 @@ def get_recent_data():
 
         cursor.execute('''
             SELECT * FROM sensor_readings
-            WHERE COALESCE(
-                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                timestamp
-            ) >= datetime('now', '-1 hour')
-            ORDER BY COALESCE(
-                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                timestamp
-            ) DESC
+            WHERE utc_timestamp >= datetime('now', '-1 hour')
+            ORDER BY utc_timestamp DESC
         ''')
 
         recent_data = []
         for row in cursor.fetchall():
-            # Use UTC timestamp for consistent client-side processing
-            timestamp_str = row['utc_timestamp'] if row['utc_timestamp'] else row['timestamp']
-
             recent_data.append({
                 'id': row['id'],
-                'timestamp': timestamp_str,
                 'utc_timestamp': row['utc_timestamp'],
-                'local_timestamp': row['local_timestamp'],
-                'timezone_offset': row['timezone_offset'],
                 'light': row['light'],
                 'soil_moisture': row['soil_moisture'],
                 'temperature': row['temperature'],
@@ -141,31 +116,16 @@ def get_chart_data():
 
         cursor.execute('''
             SELECT
-                strftime('%Y-%m-%d %H:%M', COALESCE(
-                    CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                    timestamp
-                )) as time,
-                COALESCE(
-                    CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                    timestamp
-                ) as utc_timestamp,
+                strftime('%Y-%m-%d %H:%M', utc_timestamp) as time,
+                utc_timestamp,
                 AVG(light) as light,
                 AVG(soil_moisture) as soil_moisture,
                 AVG(temperature) as temperature,
                 AVG(humidity) as humidity
             FROM sensor_readings
-            WHERE COALESCE(
-                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                timestamp
-            ) >= datetime('now', '-3 days')
-            GROUP BY strftime('%Y-%m-%d %H:%M', COALESCE(
-                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                timestamp
-            ))
-            ORDER BY COALESCE(
-                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
-                timestamp
-            ) ASC
+            WHERE utc_timestamp >= datetime('now', '-3 days')
+            GROUP BY strftime('%Y-%m-%d %H:%M', utc_timestamp)
+            ORDER BY utc_timestamp ASC
         ''')
 
         chart_data = []

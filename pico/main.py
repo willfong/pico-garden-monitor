@@ -5,12 +5,11 @@ import urequests
 import json
 from machine import Pin, ADC, Timer
 import dht
-import ntptime
 
 try:
-    from config import WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL, TIMEZONE_OFFSET
+    from config import WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL
 except ImportError:
-    print("Error: config.py not found. Please create config.py with WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL, and TIMEZONE_OFFSET")
+    print("Error: config.py not found. Please create config.py with WIFI_SSID, WIFI_PASSWORD, and ENDPOINT_URL")
     raise
 
 class GardenMonitor:
@@ -23,7 +22,6 @@ class GardenMonitor:
         self.timer = Timer()
 
         self.connect_wifi()
-        self.sync_time()
         self.start_scheduler()
 
     def connect_wifi(self):
@@ -44,28 +42,6 @@ class GardenMonitor:
                 print("\nFailed to connect to WiFi")
                 raise Exception("WiFi connection failed")
 
-    def sync_time(self):
-        """Synchronize time with NTP server"""
-        try:
-            print("Synchronizing time with NTP server...")
-            ntptime.settime()
-            print("Time synchronized with NTP server")
-
-            # Verify the sync worked
-            current_time = time.time()
-            print(f"Current UTC timestamp: {current_time}")
-
-            # Show human-readable time for verification
-            import time
-            from time import gmtime
-            tm = gmtime(current_time)
-            print(f"Current UTC time: {tm[0]}-{tm[1]:02d}-{tm[2]:02d} {tm[3]:02d}:{tm[4]:02d}:{tm[5]:02d}")
-
-        except Exception as e:
-            print(f"Failed to sync time with NTP: {e}")
-            print("Continuing with system time (may be incorrect)")
-            current_time = time.time()
-            print(f"System time: {current_time}")
 
     def read_sensors(self):
         try:
@@ -82,18 +58,11 @@ class GardenMonitor:
             temperature = self.dht_sensor.temperature()  # Celsius
             humidity = self.dht_sensor.humidity()
 
-            # Get UTC timestamp and convert to local timezone
-            utc_timestamp = time.time()
-            local_timestamp = utc_timestamp + (TIMEZONE_OFFSET * 3600)
-
             return {
                 "light": light_percentage,
                 "soil_moisture": soil_percentage,
                 "temperature": temperature,
-                "humidity": humidity,
-                "timestamp": utc_timestamp,
-                "local_timestamp": local_timestamp,
-                "timezone_offset": TIMEZONE_OFFSET
+                "humidity": humidity
             }
 
         except Exception as e:
@@ -134,15 +103,11 @@ class GardenMonitor:
             print("Failed to read sensor data")
 
     def start_scheduler(self):
-        # Calculate delay to start at the beginning of the next minute
-        current_time = time.time()
-        current_seconds = int(current_time) % 60
-        delay_to_minute = 60 - current_seconds
+        # Wait 60 seconds before starting measurements
+        print("Waiting 60 seconds before starting measurements...")
+        time.sleep(60)
 
-        print(f"Waiting {delay_to_minute} seconds to sync with minute boundary...")
-        time.sleep(delay_to_minute)
-
-        # Take initial reading at minute boundary
+        # Take initial reading
         self.sensor_task(None)
 
         # Run every 60 seconds (60000 ms) from now on
@@ -151,7 +116,7 @@ class GardenMonitor:
             mode=Timer.PERIODIC,
             callback=self.sensor_task
         )
-        print("Scheduler started - reading sensors every 60 seconds at minute boundaries")
+        print("Scheduler started - reading sensors every 60 seconds")
 
 def main():
     try:

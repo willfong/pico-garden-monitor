@@ -209,13 +209,8 @@
                 const data = await response.json();
 
                 const labels = data.map(item => {
-                    // Use UTC timestamp if available, otherwise parse the time string as UTC
-                    let date;
-                    if (item.utc_timestamp) {
-                        date = new Date(item.utc_timestamp + 'Z'); // Force UTC interpretation
-                    } else {
-                        date = new Date(item.time + 'Z'); // Force UTC interpretation
-                    }
+                    // Parse UTC timestamp and convert to local time
+                    const date = new Date(item.utc_timestamp);
                     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 });
 
@@ -246,13 +241,8 @@
                 data.forEach(item => {
                     const row = document.createElement('tr');
 
-                    // Handle timezone-aware timestamp display
-                    let date;
-                    if (item.utc_timestamp) {
-                        date = new Date(item.utc_timestamp + 'Z'); // Force UTC interpretation
-                    } else {
-                        date = new Date(item.timestamp + 'Z'); // Force UTC interpretation
-                    }
+                    // Parse UTC timestamp and convert to local time
+                    const date = new Date(item.utc_timestamp);
 
                     row.innerHTML = `
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">

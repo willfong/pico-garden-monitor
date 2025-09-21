@@ -540,7 +540,13 @@
                 'table-soil': 'Soil',
                 'table-temp': 'Temp',
                 'table-humidity': 'Humidity',
-                'last-updated': 'Last updated:'
+                'last-updated': 'Last updated:',
+                'chart-soil-label': 'Soil Moisture (%)',
+                'chart-light-label': 'Light Level (%)',
+                'chart-temp-label': 'Temperature (°C)',
+                'chart-humidity-label': 'Humidity (%)',
+                'chart-temp-axis': 'Temperature (°C)',
+                'chart-humidity-axis': 'Humidity (%)'
             },
             'zh-cn': {
                 'title': '🌱 花园监测仪表板',
@@ -558,7 +564,13 @@
                 'table-soil': '土壤',
                 'table-temp': '温度',
                 'table-humidity': '湿度',
-                'last-updated': '最后更新：'
+                'last-updated': '最后更新：',
+                'chart-soil-label': '土壤湿度 (%)',
+                'chart-light-label': '光照强度 (%)',
+                'chart-temp-label': '温度 (°C)',
+                'chart-humidity-label': '湿度 (%)',
+                'chart-temp-axis': '温度 (°C)',
+                'chart-humidity-axis': '湿度 (%)'
             },
             'zh-tw': {
                 'title': '🌱 花園監測儀表板',
@@ -576,7 +588,13 @@
                 'table-soil': '土壤',
                 'table-temp': '溫度',
                 'table-humidity': '濕度',
-                'last-updated': '最後更新：'
+                'last-updated': '最後更新：',
+                'chart-soil-label': '土壤濕度 (%)',
+                'chart-light-label': '光照強度 (%)',
+                'chart-temp-label': '溫度 (°C)',
+                'chart-humidity-label': '濕度 (%)',
+                'chart-temp-axis': '溫度 (°C)',
+                'chart-humidity-axis': '濕度 (%)'
             },
             ja: {
                 'title': '🌱 ガーデンモニターダッシュボード',
@@ -594,7 +612,13 @@
                 'table-soil': '土壌',
                 'table-temp': '温度',
                 'table-humidity': '湿度',
-                'last-updated': '最終更新：'
+                'last-updated': '最終更新：',
+                'chart-soil-label': '土壌水分 (%)',
+                'chart-light-label': '光量 (%)',
+                'chart-temp-label': '温度 (°C)',
+                'chart-humidity-label': '湿度 (%)',
+                'chart-temp-axis': '温度 (°C)',
+                'chart-humidity-axis': '湿度 (%)'
             },
             ko: {
                 'title': '🌱 정원 모니터 대시보드',
@@ -612,7 +636,13 @@
                 'table-soil': '토양',
                 'table-temp': '온도',
                 'table-humidity': '습도',
-                'last-updated': '마지막 업데이트：'
+                'last-updated': '마지막 업데이트：',
+                'chart-soil-label': '토양 수분 (%)',
+                'chart-light-label': '조도 (%)',
+                'chart-temp-label': '온도 (°C)',
+                'chart-humidity-label': '습도 (%)',
+                'chart-temp-axis': '온도 (°C)',
+                'chart-humidity-axis': '습도 (%)'
             },
             vi: {
                 'title': '🌱 Bảng Điều Khiển Giám Sát Vườn',
@@ -630,7 +660,13 @@
                 'table-soil': 'Đất',
                 'table-temp': 'Nhiệt Độ',
                 'table-humidity': 'Độ Ẩm',
-                'last-updated': 'Cập nhật lần cuối：'
+                'last-updated': 'Cập nhật lần cuối：',
+                'chart-soil-label': 'Độ Ẩm Đất (%)',
+                'chart-light-label': 'Mức Ánh Sáng (%)',
+                'chart-temp-label': 'Nhiệt Độ (°C)',
+                'chart-humidity-label': 'Độ Ẩm (%)',
+                'chart-temp-axis': 'Nhiệt Độ (°C)',
+                'chart-humidity-axis': 'Độ Ẩm (%)'
             },
             th: {
                 'title': '🌱 แดชบอร์ดตรวจสอบสวน',
@@ -648,7 +684,13 @@
                 'table-soil': 'ดิน',
                 'table-temp': 'อุณหภูมิ',
                 'table-humidity': 'ความชื้น',
-                'last-updated': 'อัปเดตล่าสุด：'
+                'last-updated': 'อัปเดตล่าสุด：',
+                'chart-soil-label': 'ความชื้นดิน (%)',
+                'chart-light-label': 'ระดับแสง (%)',
+                'chart-temp-label': 'อุณหภูมิ (°C)',
+                'chart-humidity-label': 'ความชื้น (%)',
+                'chart-temp-axis': 'อุณหภูมิ (°C)',
+                'chart-humidity-axis': 'ความชื้น (%)'
             }
         };
 
@@ -667,6 +709,7 @@
         function setLanguage(lang) {
             currentLanguage = lang;
             translatePage();
+            updateChartLabels();
             updateLanguageToggle();
             document.getElementById('language-menu').classList.add('hidden');
         }
@@ -679,6 +722,28 @@
                     element.textContent = translations[currentLanguage][key];
                 }
             });
+        }
+
+        function updateChartLabels() {
+            if (soilLightChart && tempHumidityChart && translations[currentLanguage]) {
+                const trans = translations[currentLanguage];
+
+                // Update soil/light chart labels
+                soilLightChart.data.datasets[0].label = trans['chart-soil-label'] || 'Soil Moisture (%)';
+                soilLightChart.data.datasets[1].label = trans['chart-light-label'] || 'Light Level (%)';
+
+                // Update temperature/humidity chart labels
+                tempHumidityChart.data.datasets[0].label = trans['chart-temp-label'] || 'Temperature (°C)';
+                tempHumidityChart.data.datasets[1].label = trans['chart-humidity-label'] || 'Humidity (%)';
+
+                // Update axis titles
+                tempHumidityChart.options.scales.y.title.text = trans['chart-temp-axis'] || 'Temperature (°C)';
+                tempHumidityChart.options.scales.y1.title.text = trans['chart-humidity-axis'] || 'Humidity (%)';
+
+                // Update the charts
+                soilLightChart.update();
+                tempHumidityChart.update();
+            }
         }
 
         function updateLanguageToggle() {

@@ -216,7 +216,7 @@
                     } else {
                         date = new Date(item.time + 'Z'); // Force UTC interpretation
                     }
-                    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
                 });
 
                 soilLightChart.data.labels = labels;
@@ -256,7 +256,7 @@
 
                     row.innerHTML = `
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
-                            ${date.toLocaleTimeString()}
+                            ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})}
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${item.light}%</td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">${item.soil_moisture}%</td>
@@ -276,7 +276,7 @@
                 }
 
                 // Update last updated time
-                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 
             } catch (error) {
                 console.error('Error updating recent data:', error);

@@ -31,8 +31,17 @@ def simulate_sensor_data(timezone_offset):
 
 def test_timezone_data():
     """Test sending data from different timezones"""
-    print("🧪 Testing Garden Monitor Timezone Functionality")
+    print("🧪 Testing Garden Monitor Timezone & Timer Functionality")
     print("=" * 50)
+
+    # Show current minute boundary info
+    current_time = time.time()
+    current_seconds = int(current_time) % 60
+    delay_to_minute = 60 - current_seconds
+    print(f"⏰ Current time: {datetime.fromtimestamp(current_time).strftime('%H:%M:%S')}")
+    print(f"   Seconds until next minute: {delay_to_minute}")
+    print(f"   (Pico would wait this long to sync with minute boundary)")
+    print()
 
     # Test different timezone offsets
     test_zones = [
@@ -120,5 +129,7 @@ if __name__ == "__main__":
 
     print(f"\n💡 Tips:")
     print(f"   • Open {SERVER_URL} in different browsers/devices in various timezones")
-    print(f"   • All timestamps should display correctly in each user's local time")
+    print(f"   • All timestamps should display in 24-hour format without seconds")
+    print(f"   • Times display correctly in each user's local timezone")
     print(f"   • The Pico W config should be set to TIMEZONE_OFFSET matching your location")
+    print(f"   • Pico W will now sync readings to minute boundaries for cleaner data")

@@ -109,16 +109,24 @@ class GardenMonitor:
             print("Failed to read sensor data")
 
     def start_scheduler(self):
-        # Run every 60 seconds (60000 ms)
+        # Calculate delay to start at the beginning of the next minute
+        current_time = time.time()
+        current_seconds = int(current_time) % 60
+        delay_to_minute = 60 - current_seconds
+
+        print(f"Waiting {delay_to_minute} seconds to sync with minute boundary...")
+        time.sleep(delay_to_minute)
+
+        # Take initial reading at minute boundary
+        self.sensor_task(None)
+
+        # Run every 60 seconds (60000 ms) from now on
         self.timer.init(
             period=60000,
             mode=Timer.PERIODIC,
             callback=self.sensor_task
         )
-        print("Scheduler started - reading sensors every 60 seconds")
-
-        # Take initial reading
-        self.sensor_task(None)
+        print("Scheduler started - reading sensors every 60 seconds at minute boundaries")
 
 def main():
     try:

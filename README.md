@@ -67,7 +67,7 @@ A comprehensive garden monitoring system using Raspberry Pi Pico W with sensors 
 
 ### Pico W Sensor Script
 - **WiFi Connectivity**: Automatic connection with retry logic
-- **Precise Timing**: Uses Timer interrupt to read sensors every 60 seconds (no drift)
+- **Minute-Synchronized Timing**: Automatically syncs to minute boundaries, then reads sensors every 60 seconds
 - **Multiple Sensors**:
   - Light level (0-100%)
   - Soil moisture (0-100%, where higher = wetter)
@@ -82,6 +82,7 @@ A comprehensive garden monitoring system using Raspberry Pi Pico W with sensors 
 - **Historical Charts**: 3-day trend graphs using Chart.js
 - **Recent Data Table**: Detailed minute-by-minute readings for the past hour
 - **Auto-refresh**: Dashboard updates every 30 seconds
+- **24-Hour Time Format**: Clean time display without seconds, automatically in user's timezone
 
 ### Database
 - **SQLite Storage**: All sensor data stored locally

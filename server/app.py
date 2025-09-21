@@ -98,8 +98,14 @@ def get_recent_data():
 
         cursor.execute('''
             SELECT * FROM sensor_readings
-            WHERE utc_timestamp >= datetime('now', '-1 hour')
-            ORDER BY utc_timestamp DESC
+            WHERE COALESCE(
+                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                timestamp
+            ) >= datetime('now', '-1 hour')
+            ORDER BY COALESCE(
+                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                timestamp
+            ) DESC
         ''')
 
         recent_data = []
@@ -135,16 +141,31 @@ def get_chart_data():
 
         cursor.execute('''
             SELECT
-                strftime('%Y-%m-%d %H:%M', COALESCE(utc_timestamp, timestamp)) as time,
-                utc_timestamp,
+                strftime('%Y-%m-%d %H:%M', COALESCE(
+                    CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                    timestamp
+                )) as time,
+                COALESCE(
+                    CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                    timestamp
+                ) as utc_timestamp,
                 AVG(light) as light,
                 AVG(soil_moisture) as soil_moisture,
                 AVG(temperature) as temperature,
                 AVG(humidity) as humidity
             FROM sensor_readings
-            WHERE COALESCE(utc_timestamp, timestamp) >= datetime('now', '-3 days')
-            GROUP BY strftime('%Y-%m-%d %H:%M', COALESCE(utc_timestamp, timestamp))
-            ORDER BY COALESCE(utc_timestamp, timestamp) ASC
+            WHERE COALESCE(
+                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                timestamp
+            ) >= datetime('now', '-3 days')
+            GROUP BY strftime('%Y-%m-%d %H:%M', COALESCE(
+                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                timestamp
+            ))
+            ORDER BY COALESCE(
+                CASE WHEN utc_timestamp > '2022-01-01' THEN utc_timestamp ELSE NULL END,
+                timestamp
+            ) ASC
         ''')
 
         chart_data = []

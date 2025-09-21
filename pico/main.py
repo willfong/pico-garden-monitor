@@ -5,6 +5,7 @@ import urequests
 import json
 from machine import Pin, ADC, Timer
 import dht
+import ntptime
 
 try:
     from config import WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL, TIMEZONE_OFFSET
@@ -22,6 +23,7 @@ class GardenMonitor:
         self.timer = Timer()
 
         self.connect_wifi()
+        self.sync_time()
         self.start_scheduler()
 
     def connect_wifi(self):
@@ -41,6 +43,29 @@ class GardenMonitor:
             else:
                 print("\nFailed to connect to WiFi")
                 raise Exception("WiFi connection failed")
+
+    def sync_time(self):
+        """Synchronize time with NTP server"""
+        try:
+            print("Synchronizing time with NTP server...")
+            ntptime.settime()
+            print("Time synchronized with NTP server")
+
+            # Verify the sync worked
+            current_time = time.time()
+            print(f"Current UTC timestamp: {current_time}")
+
+            # Show human-readable time for verification
+            import time
+            from time import gmtime
+            tm = gmtime(current_time)
+            print(f"Current UTC time: {tm[0]}-{tm[1]:02d}-{tm[2]:02d} {tm[3]:02d}:{tm[4]:02d}:{tm[5]:02d}")
+
+        except Exception as e:
+            print(f"Failed to sync time with NTP: {e}")
+            print("Continuing with system time (may be incorrect)")
+            current_time = time.time()
+            print(f"System time: {current_time}")
 
     def read_sensors(self):
         try:

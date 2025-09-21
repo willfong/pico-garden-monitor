@@ -514,7 +514,203 @@
                 updateCharts();
                 updateRecentData();
             }, 30000);
-            // Initialize language toggle functionality\n            initializeLanguageToggle();\n        });\n\n        // Language functionality\n        let currentLanguage = 'en';\n\n        // Translation dictionary\n        const translations = {\n            en: {\n                'title': '🌱 Garden Monitor Dashboard',\n                'subtitle': 'Real-time monitoring of your garden\\'s environmental conditions',\n                'timezone-info': 'All times displayed in your local timezone:',\n                'light-level': 'Light Level',\n                'soil-moisture': 'Soil Moisture',\n                'temperature': 'Temperature',\n                'humidity': 'Humidity',\n                'chart-soil-light': 'Soil Moisture & Light (3 Days - Hourly Averages)',\n                'chart-temp-humidity': 'Temperature & Humidity (3 Days - Hourly Averages)',\n                'recent-readings': 'Recent Readings (Past Hour)',\n                'table-time': 'Time',\n                'table-light': 'Light',\n                'table-soil': 'Soil',\n                'table-temp': 'Temp',\n                'table-humidity': 'Humidity',\n                'last-updated': 'Last updated:'\n            },\n            'zh-cn': {\n                'title': '🌱 花园监测仪表板',\n                'subtitle': '实时监测您花园的环境状况',\n                'timezone-info': '所有时间均显示为您的本地时区：',\n                'light-level': '光照强度',\n                'soil-moisture': '土壤湿度',\n                'temperature': '温度',\n                'humidity': '湿度',\n                'chart-soil-light': '土壤湿度和光照（3天 - 小时平均值）',\n                'chart-temp-humidity': '温度和湿度（3天 - 小时平均值）',\n                'recent-readings': '最近读数（过去一小时）',\n                'table-time': '时间',\n                'table-light': '光照',\n                'table-soil': '土壤',\n                'table-temp': '温度',\n                'table-humidity': '湿度',\n                'last-updated': '最后更新：'\n            },\n            'zh-tw': {\n                'title': '🌱 花園監測儀表板',\n                'subtitle': '即時監測您花園的環境狀況',\n                'timezone-info': '所有時間均顯示為您的本地時區：',\n                'light-level': '光照強度',\n                'soil-moisture': '土壤濕度',\n                'temperature': '溫度',\n                'humidity': '濕度',\n                'chart-soil-light': '土壤濕度和光照（3天 - 小時平均值）',\n                'chart-temp-humidity': '溫度和濕度（3天 - 小時平均值）',\n                'recent-readings': '最近讀數（過去一小時）',\n                'table-time': '時間',\n                'table-light': '光照',\n                'table-soil': '土壤',\n                'table-temp': '溫度',\n                'table-humidity': '濕度',\n                'last-updated': '最後更新：'\n            },\n            ja: {\n                'title': '🌱 ガーデンモニターダッシュボード',\n                'subtitle': 'お庭の環境状況をリアルタイムで監視',\n                'timezone-info': 'すべての時刻はお客様の現地時間で表示されます：',\n                'light-level': '光量',\n                'soil-moisture': '土壌水分',\n                'temperature': '温度',\n                'humidity': '湿度',\n                'chart-soil-light': '土壌水分と光量（3日間 - 時間平均）',\n                'chart-temp-humidity': '温度と湿度（3日間 - 時間平均）',\n                'recent-readings': '最近の測定値（過去1時間）',\n                'table-time': '時刻',\n                'table-light': '光量',\n                'table-soil': '土壌',\n                'table-temp': '温度',\n                'table-humidity': '湿度',\n                'last-updated': '最終更新：'\n            },\n            ko: {\n                'title': '🌱 정원 모니터 대시보드',\n                'subtitle': '정원의 환경 조건을 실시간으로 모니터링',\n                'timezone-info': '모든 시간은 현지 시간대로 표시됩니다：',\n                'light-level': '조도',\n                'soil-moisture': '토양 수분',\n                'temperature': '온도',\n                'humidity': '습도',\n                'chart-soil-light': '토양 수분 및 조도 (3일 - 시간별 평균)',\n                'chart-temp-humidity': '온도 및 습도 (3일 - 시간별 평균)',\n                'recent-readings': '최근 측정값 (지난 1시간)',\n                'table-time': '시간',\n                'table-light': '조도',\n                'table-soil': '토양',\n                'table-temp': '온도',\n                'table-humidity': '습도',\n                'last-updated': '마지막 업데이트：'\n            },\n            vi: {\n                'title': '🌱 Bảng Điều Khiển Giám Sát Vườn',\n                'subtitle': 'Theo dõi điều kiện môi trường vườn của bạn theo thời gian thực',\n                'timezone-info': 'Tất cả thời gian được hiển thị theo múi giờ địa phương của bạn：',\n                'light-level': 'Mức Ánh Sáng',\n                'soil-moisture': 'Độ Ẩm Đất',\n                'temperature': 'Nhiệt Độ',\n                'humidity': 'Độ Ẩm',\n                'chart-soil-light': 'Độ Ẩm Đất & Ánh Sáng (3 Ngày - Trung Bình Theo Giờ)',\n                'chart-temp-humidity': 'Nhiệt Độ & Độ Ẩm (3 Ngày - Trung Bình Theo Giờ)',\n                'recent-readings': 'Số Đo Gần Đây (Giờ Qua)',\n                'table-time': 'Thời Gian',\n                'table-light': 'Ánh Sáng',\n                'table-soil': 'Đất',\n                'table-temp': 'Nhiệt Độ',\n                'table-humidity': 'Độ Ẩm',\n                'last-updated': 'Cập nhật lần cuối：'\n            },\n            th: {\n                'title': '🌱 แดชบอร์ดตรวจสอบสวน',\n                'subtitle': 'ตรวจสอบสภาพแวดล้อมของสวนแบบเรียลไทม์',\n                'timezone-info': 'เวลาทั้งหมดแสดงในเขตเวลาท้องถิ่นของคุณ：',\n                'light-level': 'ระดับแสง',\n                'soil-moisture': 'ความชื้นดิน',\n                'temperature': 'อุณหภูมิ',\n                'humidity': 'ความชื้น',\n                'chart-soil-light': 'ความชื้นดินและแสง (3 วัน - ค่าเฉลี่ยรายชั่วโมง)',\n                'chart-temp-humidity': 'อุณหภูมิและความชื้น (3 วัน - ค่าเฉลี่ยรายชั่วโมง)',\n                'recent-readings': 'ข้อมูลล่าสุด (ชั่วโมงที่ผ่านมา)',\n                'table-time': 'เวลา',\n                'table-light': 'แสง',\n                'table-soil': 'ดิน',\n                'table-temp': 'อุณหภูมิ',\n                'table-humidity': 'ความชื้น',\n                'last-updated': 'อัปเดตล่าสุด：'\n            }\n        };\n\n        // Language configuration\n        const languageConfig = {\n            en: { flag: '🇺🇸', code: 'EN' },\n            'zh-cn': { flag: '🇨🇳', code: '简体' },\n            'zh-tw': { flag: '🇹🇼', code: '繁體' },\n            ja: { flag: '🇯🇵', code: '日本語' },\n            ko: { flag: '🇰🇷', code: '한국어' },\n            vi: { flag: '🇻🇳', code: 'Tiếng Việt' },\n            th: { flag: '🇹🇭', code: 'ไทย' }\n        };\n\n        // Translation functions\n        function setLanguage(lang) {\n            currentLanguage = lang;\n            translatePage();\n            updateLanguageToggle();\n            document.getElementById('language-menu').classList.add('hidden');\n        }\n\n        function translatePage() {\n            const elements = document.querySelectorAll('[data-i18n]');\n            elements.forEach(element => {\n                const key = element.getAttribute('data-i18n');\n                if (translations[currentLanguage] && translations[currentLanguage][key]) {\n                    element.textContent = translations[currentLanguage][key];\n                }\n            });\n        }\n\n        function updateLanguageToggle() {\n            const config = languageConfig[currentLanguage];\n            document.getElementById('current-flag').textContent = config.flag;\n            document.getElementById('current-lang').textContent = config.code;\n        }\n\n        function initializeLanguageToggle() {\n            // Language toggle click handler\n            document.getElementById('language-toggle').addEventListener('click', function() {\n                const menu = document.getElementById('language-menu');\n                menu.classList.toggle('hidden');\n            });\n\n            // Language option click handlers\n            document.querySelectorAll('.language-option').forEach(button => {\n                button.addEventListener('click', function() {\n                    const lang = this.getAttribute('data-lang');\n                    setLanguage(lang);\n                });\n            });\n\n            // Close menu when clicking outside\n            document.addEventListener('click', function(event) {\n                const toggle = document.getElementById('language-toggle');\n                const menu = document.getElementById('language-menu');\n                if (!toggle.contains(event.target) && !menu.contains(event.target)) {\n                    menu.classList.add('hidden');\n                }\n            });\n        }
+
+            // Initialize language toggle functionality
+            initializeLanguageToggle();
+        });
+
+        // Language functionality
+        let currentLanguage = 'en';
+
+        // Translation dictionary
+        const translations = {
+            en: {
+                'title': '🌱 Garden Monitor Dashboard',
+                'subtitle': 'Real-time monitoring of your garden\'s environmental conditions',
+                'timezone-info': 'All times displayed in your local timezone:',
+                'light-level': 'Light Level',
+                'soil-moisture': 'Soil Moisture',
+                'temperature': 'Temperature',
+                'humidity': 'Humidity',
+                'chart-soil-light': 'Soil Moisture & Light (3 Days - Hourly Averages)',
+                'chart-temp-humidity': 'Temperature & Humidity (3 Days - Hourly Averages)',
+                'recent-readings': 'Recent Readings (Past Hour)',
+                'table-time': 'Time',
+                'table-light': 'Light',
+                'table-soil': 'Soil',
+                'table-temp': 'Temp',
+                'table-humidity': 'Humidity',
+                'last-updated': 'Last updated:'
+            },
+            'zh-cn': {
+                'title': '🌱 花园监测仪表板',
+                'subtitle': '实时监测您花园的环境状况',
+                'timezone-info': '所有时间均显示为您的本地时区：',
+                'light-level': '光照强度',
+                'soil-moisture': '土壤湿度',
+                'temperature': '温度',
+                'humidity': '湿度',
+                'chart-soil-light': '土壤湿度和光照（3天 - 小时平均值）',
+                'chart-temp-humidity': '温度和湿度（3天 - 小时平均值）',
+                'recent-readings': '最近读数（过去一小时）',
+                'table-time': '时间',
+                'table-light': '光照',
+                'table-soil': '土壤',
+                'table-temp': '温度',
+                'table-humidity': '湿度',
+                'last-updated': '最后更新：'
+            },
+            'zh-tw': {
+                'title': '🌱 花園監測儀表板',
+                'subtitle': '即時監測您花園的環境狀況',
+                'timezone-info': '所有時間均顯示為您的本地時區：',
+                'light-level': '光照強度',
+                'soil-moisture': '土壤濕度',
+                'temperature': '溫度',
+                'humidity': '濕度',
+                'chart-soil-light': '土壤濕度和光照（3天 - 小時平均值）',
+                'chart-temp-humidity': '溫度和濕度（3天 - 小時平均值）',
+                'recent-readings': '最近讀數（過去一小時）',
+                'table-time': '時間',
+                'table-light': '光照',
+                'table-soil': '土壤',
+                'table-temp': '溫度',
+                'table-humidity': '濕度',
+                'last-updated': '最後更新：'
+            },
+            ja: {
+                'title': '🌱 ガーデンモニターダッシュボード',
+                'subtitle': 'お庭の環境状況をリアルタイムで監視',
+                'timezone-info': 'すべての時刻はお客様の現地時間で表示されます：',
+                'light-level': '光量',
+                'soil-moisture': '土壌水分',
+                'temperature': '温度',
+                'humidity': '湿度',
+                'chart-soil-light': '土壌水分と光量（3日間 - 時間平均）',
+                'chart-temp-humidity': '温度と湿度（3日間 - 時間平均）',
+                'recent-readings': '最近の測定値（過去1時間）',
+                'table-time': '時刻',
+                'table-light': '光量',
+                'table-soil': '土壌',
+                'table-temp': '温度',
+                'table-humidity': '湿度',
+                'last-updated': '最終更新：'
+            },
+            ko: {
+                'title': '🌱 정원 모니터 대시보드',
+                'subtitle': '정원의 환경 조건을 실시간으로 모니터링',
+                'timezone-info': '모든 시간은 현지 시간대로 표시됩니다：',
+                'light-level': '조도',
+                'soil-moisture': '토양 수분',
+                'temperature': '온도',
+                'humidity': '습도',
+                'chart-soil-light': '토양 수분 및 조도 (3일 - 시간별 평균)',
+                'chart-temp-humidity': '온도 및 습도 (3일 - 시간별 평균)',
+                'recent-readings': '최근 측정값 (지난 1시간)',
+                'table-time': '시간',
+                'table-light': '조도',
+                'table-soil': '토양',
+                'table-temp': '온도',
+                'table-humidity': '습도',
+                'last-updated': '마지막 업데이트：'
+            },
+            vi: {
+                'title': '🌱 Bảng Điều Khiển Giám Sát Vườn',
+                'subtitle': 'Theo dõi điều kiện môi trường vườn của bạn theo thời gian thực',
+                'timezone-info': 'Tất cả thời gian được hiển thị theo múi giờ địa phương của bạn：',
+                'light-level': 'Mức Ánh Sáng',
+                'soil-moisture': 'Độ Ẩm Đất',
+                'temperature': 'Nhiệt Độ',
+                'humidity': 'Độ Ẩm',
+                'chart-soil-light': 'Độ Ẩm Đất & Ánh Sáng (3 Ngày - Trung Bình Theo Giờ)',
+                'chart-temp-humidity': 'Nhiệt Độ & Độ Ẩm (3 Ngày - Trung Bình Theo Giờ)',
+                'recent-readings': 'Số Đo Gần Đây (Giờ Qua)',
+                'table-time': 'Thời Gian',
+                'table-light': 'Ánh Sáng',
+                'table-soil': 'Đất',
+                'table-temp': 'Nhiệt Độ',
+                'table-humidity': 'Độ Ẩm',
+                'last-updated': 'Cập nhật lần cuối：'
+            },
+            th: {
+                'title': '🌱 แดชบอร์ดตรวจสอบสวน',
+                'subtitle': 'ตรวจสอบสภาพแวดล้อมของสวนแบบเรียลไทม์',
+                'timezone-info': 'เวลาทั้งหมดแสดงในเขตเวลาท้องถิ่นของคุณ：',
+                'light-level': 'ระดับแสง',
+                'soil-moisture': 'ความชื้นดิน',
+                'temperature': 'อุณหภูมิ',
+                'humidity': 'ความชื้น',
+                'chart-soil-light': 'ความชื้นดินและแสง (3 วัน - ค่าเฉลี่ยรายชั่วโมง)',
+                'chart-temp-humidity': 'อุณหภูมิและความชื้น (3 วัน - ค่าเฉลี่ยรายชั่วโมง)',
+                'recent-readings': 'ข้อมูลล่าสุด (ชั่วโมงที่ผ่านมา)',
+                'table-time': 'เวลา',
+                'table-light': 'แสง',
+                'table-soil': 'ดิน',
+                'table-temp': 'อุณหภูมิ',
+                'table-humidity': 'ความชื้น',
+                'last-updated': 'อัปเดตล่าสุด：'
+            }
+        };
+
+        // Language configuration
+        const languageConfig = {
+            en: { flag: '🇺🇸', code: 'EN' },
+            'zh-cn': { flag: '🇨🇳', code: '简体' },
+            'zh-tw': { flag: '🇹🇼', code: '繁體' },
+            ja: { flag: '🇯🇵', code: '日本語' },
+            ko: { flag: '🇰🇷', code: '한국어' },
+            vi: { flag: '🇻🇳', code: 'Tiếng Việt' },
+            th: { flag: '🇹🇭', code: 'ไทย' }
+        };
+
+        // Translation functions
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            translatePage();
+            updateLanguageToggle();
+            document.getElementById('language-menu').classList.add('hidden');
+        }
+
+        function translatePage() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        function updateLanguageToggle() {
+            const config = languageConfig[currentLanguage];
+            document.getElementById('current-flag').textContent = config.flag;
+            document.getElementById('current-lang').textContent = config.code;
+        }
+
+        function initializeLanguageToggle() {
+            // Language toggle click handler
+            document.getElementById('language-toggle').addEventListener('click', function() {
+                const menu = document.getElementById('language-menu');
+                menu.classList.toggle('hidden');
+            });
+
+            // Language option click handlers
+            document.querySelectorAll('.language-option').forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    setLanguage(lang);
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const toggle = document.getElementById('language-toggle');
+                const menu = document.getElementById('language-menu');
+                if (!toggle.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
     </script>
 </body>
 </html>

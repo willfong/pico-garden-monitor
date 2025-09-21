@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import sqlite3
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 
 app = Flask(__name__)
@@ -18,6 +18,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS sensor_readings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            utc_timestamp DATETIME,
+            local_timestamp DATETIME,
+            timezone_offset INTEGER,
             light REAL,
             soil_moisture REAL,
             temperature REAL,
@@ -50,14 +53,30 @@ def receive_sensor_data():
             if field not in data:
                 return jsonify({'error': f'Missing field: {field}'}), 400
 
+        # Handle timezone information
+        utc_timestamp = None
+        local_timestamp = None
+        timezone_offset = None
+
+        if 'timestamp' in data:
+            # Convert Unix timestamp to datetime
+            utc_timestamp = datetime.fromtimestamp(data['timestamp'], tz=timezone.utc)
+
+        if 'local_timestamp' in data:
+            # Convert Unix timestamp to datetime
+            local_timestamp = datetime.fromtimestamp(data['local_timestamp'], tz=timezone.utc)
+
+        if 'timezone_offset' in data:
+            timezone_offset = data['timezone_offset']
+
         # Insert data into database
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute('''
-            INSERT INTO sensor_readings (light, soil_moisture, temperature, humidity)
-            VALUES (?, ?, ?, ?)
-        ''', (data['light'], data['soil_moisture'], data['temperature'], data['humidity']))
+            INSERT INTO sensor_readings (utc_timestamp, local_timestamp, timezone_offset, light, soil_moisture, temperature, humidity)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (utc_timestamp, local_timestamp, timezone_offset, data['light'], data['soil_moisture'], data['temperature'], data['humidity']))
 
         conn.commit()
         conn.close()
@@ -79,15 +98,21 @@ def get_recent_data():
 
         cursor.execute('''
             SELECT * FROM sensor_readings
-            WHERE timestamp >= datetime('now', '-1 hour')
-            ORDER BY timestamp DESC
+            WHERE utc_timestamp >= datetime('now', '-1 hour')
+            ORDER BY utc_timestamp DESC
         ''')
 
         recent_data = []
         for row in cursor.fetchall():
+            # Use UTC timestamp for consistent client-side processing
+            timestamp_str = row['utc_timestamp'] if row['utc_timestamp'] else row['timestamp']
+
             recent_data.append({
                 'id': row['id'],
-                'timestamp': row['timestamp'],
+                'timestamp': timestamp_str,
+                'utc_timestamp': row['utc_timestamp'],
+                'local_timestamp': row['local_timestamp'],
+                'timezone_offset': row['timezone_offset'],
                 'light': row['light'],
                 'soil_moisture': row['soil_moisture'],
                 'temperature': row['temperature'],
@@ -110,21 +135,23 @@ def get_chart_data():
 
         cursor.execute('''
             SELECT
-                strftime('%Y-%m-%d %H:%M', timestamp) as time,
+                strftime('%Y-%m-%d %H:%M', COALESCE(utc_timestamp, timestamp)) as time,
+                utc_timestamp,
                 AVG(light) as light,
                 AVG(soil_moisture) as soil_moisture,
                 AVG(temperature) as temperature,
                 AVG(humidity) as humidity
             FROM sensor_readings
-            WHERE timestamp >= datetime('now', '-3 days')
-            GROUP BY strftime('%Y-%m-%d %H:%M', timestamp)
-            ORDER BY timestamp ASC
+            WHERE COALESCE(utc_timestamp, timestamp) >= datetime('now', '-3 days')
+            GROUP BY strftime('%Y-%m-%d %H:%M', COALESCE(utc_timestamp, timestamp))
+            ORDER BY COALESCE(utc_timestamp, timestamp) ASC
         ''')
 
         chart_data = []
         for row in cursor.fetchall():
             chart_data.append({
                 'time': row['time'],
+                'utc_timestamp': row['utc_timestamp'],
                 'light': round(row['light'], 2) if row['light'] else 0,
                 'soil_moisture': round(row['soil_moisture'], 2) if row['soil_moisture'] else 0,
                 'temperature': round(row['temperature'], 2) if row['temperature'] else 0,

@@ -7,9 +7,9 @@ from machine import Pin, ADC, Timer
 import dht
 
 try:
-    from config import WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL
+    from config import WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL, TIMEZONE_OFFSET
 except ImportError:
-    print("Error: config.py not found. Please create config.py with WIFI_SSID, WIFI_PASSWORD, and ENDPOINT_URL")
+    print("Error: config.py not found. Please create config.py with WIFI_SSID, WIFI_PASSWORD, ENDPOINT_URL, and TIMEZONE_OFFSET")
     raise
 
 class GardenMonitor:
@@ -57,12 +57,18 @@ class GardenMonitor:
             temperature = self.dht_sensor.temperature()  # Celsius
             humidity = self.dht_sensor.humidity()
 
+            # Get UTC timestamp and convert to local timezone
+            utc_timestamp = time.time()
+            local_timestamp = utc_timestamp + (TIMEZONE_OFFSET * 3600)
+
             return {
                 "light": light_percentage,
                 "soil_moisture": soil_percentage,
                 "temperature": temperature,
                 "humidity": humidity,
-                "timestamp": time.time()
+                "timestamp": utc_timestamp,
+                "local_timestamp": local_timestamp,
+                "timezone_offset": TIMEZONE_OFFSET
             }
 
         except Exception as e:

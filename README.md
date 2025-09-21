@@ -33,6 +33,7 @@ A comprehensive garden monitoring system using Raspberry Pi Pico W with sensors 
    WIFI_SSID = "your_wifi_network_name"
    WIFI_PASSWORD = "your_wifi_password"
    ENDPOINT_URL = "http://192.168.1.100:5000/api/sensor-data"  # Replace with your server IP
+   TIMEZONE_OFFSET = 8  # Timezone offset from UTC in hours (e.g., +8 for Singapore, -5 for EST)
    ```
 
 4. **Upload files to Pico W**:
@@ -96,6 +97,15 @@ The sensor readings are processed as follows:
 - **Light Sensor**: Raw ADC value (0-65535) converted to percentage (0-100%)
 - **Soil Moisture**: Raw ADC value inverted so higher values indicate wetter soil
 - **DHT11**: Direct temperature (°C) and humidity (%) readings
+
+### Timezone Configuration
+
+The system handles timezones properly:
+
+- **Pico W**: Sends both UTC and local timestamps based on `TIMEZONE_OFFSET` setting
+- **Server**: Stores timezone-aware timestamps for accurate data handling
+- **Dashboard**: Automatically displays all times in the user's browser timezone
+- **Data Consistency**: All historical data maintains proper timezone information
 
 ### Server Configuration
 

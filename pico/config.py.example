@@ -4,3 +4,7 @@ WIFI_PASSWORD = "your_wifi_password"
 
 # Server endpoint URL
 ENDPOINT_URL = "http://192.168.1.100:5000/api/sensor-data"
+
+# Timezone Configuration
+# Timezone offset from UTC in hours (e.g., +8 for Singapore, -5 for EST, 0 for UTC)
+TIMEZONE_OFFSET = 8

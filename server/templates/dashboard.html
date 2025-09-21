@@ -14,6 +14,9 @@
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">🌱 Garden Monitor Dashboard</h1>
             <p class="text-gray-600">Real-time monitoring of your garden's environmental conditions</p>
+            <p class="text-sm text-gray-500 mt-1">
+                All times displayed in your local timezone: <span id="user-timezone">Loading...</span>
+            </p>
         </div>
 
         <!-- Current Status Cards -->
@@ -206,7 +209,13 @@
                 const data = await response.json();
 
                 const labels = data.map(item => {
-                    const date = new Date(item.time);
+                    // Use UTC timestamp if available, otherwise parse the time string as UTC
+                    let date;
+                    if (item.utc_timestamp) {
+                        date = new Date(item.utc_timestamp + 'Z'); // Force UTC interpretation
+                    } else {
+                        date = new Date(item.time + 'Z'); // Force UTC interpretation
+                    }
                     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 });
 
@@ -236,7 +245,14 @@
 
                 data.forEach(item => {
                     const row = document.createElement('tr');
-                    const date = new Date(item.timestamp);
+
+                    // Handle timezone-aware timestamp display
+                    let date;
+                    if (item.utc_timestamp) {
+                        date = new Date(item.utc_timestamp + 'Z'); // Force UTC interpretation
+                    } else {
+                        date = new Date(item.timestamp + 'Z'); // Force UTC interpretation
+                    }
 
                     row.innerHTML = `
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
@@ -267,8 +283,21 @@
             }
         }
 
+        // Display user's timezone
+        function displayUserTimezone() {
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const offset = new Date().getTimezoneOffset();
+            const offsetHours = Math.abs(offset / 60);
+            const offsetMinutes = Math.abs(offset % 60);
+            const offsetSign = offset <= 0 ? '+' : '-';
+
+            document.getElementById('user-timezone').textContent =
+                `${timezone} (UTC${offsetSign}${offsetHours.toString().padStart(2, '0')}:${offsetMinutes.toString().padStart(2, '0')})`;
+        }
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            displayUserTimezone();
             initCharts();
             updateCharts();
             updateRecentData();

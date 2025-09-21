@@ -394,8 +394,19 @@
                     const row = document.createElement('tr');
 
                     // Parse UTC timestamp and convert to local time
-                    const utcTimestamp = item.utc_timestamp.endsWith('Z') ? item.utc_timestamp : item.utc_timestamp + 'Z';
-                    const date = new Date(utcTimestamp);
+                    let date;
+                    if (item.utc_timestamp) {
+                        // Handle different timestamp formats from database
+                        const utcTimestamp = item.utc_timestamp.endsWith('Z') ? item.utc_timestamp : item.utc_timestamp + 'Z';
+                        date = new Date(utcTimestamp);
+
+                        // Fallback if still invalid
+                        if (isNaN(date.getTime())) {
+                            date = new Date(item.utc_timestamp);
+                        }
+                    } else {
+                        date = new Date(); // Fallback to current time
+                    }
 
                     row.innerHTML = `
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">

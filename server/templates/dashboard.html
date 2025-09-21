@@ -109,6 +109,118 @@
     <script>
         let soilLightChart;
         let tempHumidityChart;
+        let crosshairX = null;
+        let isHovering = false;
+
+        // Crosshair plugin for synchronized interaction
+        const crosshairPlugin = {
+            id: 'crosshair',
+            afterDraw: function(chart) {
+                if (crosshairX !== null && isHovering) {
+                    const ctx = chart.ctx;
+                    const chartArea = chart.chartArea;
+
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(crosshairX, chartArea.top);
+                    ctx.lineTo(crosshairX, chartArea.bottom);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
+        // Function to sync crosshair between charts
+        function syncCrosshair(sourceChart, targetChart, event) {
+            const canvasRect = sourceChart.canvas.getBoundingClientRect();
+            const x = event.clientX - canvasRect.left;
+
+            crosshairX = x;
+            isHovering = true;
+
+            // Update both charts
+            sourceChart.update('none');
+            targetChart.update('none');
+
+            // Show synchronized tooltips
+            showSyncedTooltips(x, event);
+        }
+
+        // Function to show synchronized tooltips
+        function showSyncedTooltips(x, event) {
+            const soilLightPoints = soilLightChart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, false);
+            const tempHumidityPoints = tempHumidityChart.getElementsAtEventForMode(event, 'nearest', { intersect: false }, false);
+
+            if (soilLightPoints.length > 0 || tempHumidityPoints.length > 0) {
+                let tooltipContent = '';
+
+                if (soilLightPoints.length > 0) {
+                    const index = soilLightPoints[0].index;
+                    const soilData = soilLightChart.data.datasets[0].data[index];
+                    const lightData = soilLightChart.data.datasets[1].data[index];
+                    const time = soilLightChart.data.labels[index];
+
+                    tooltipContent += `<div><strong>Time:</strong> ${time}</div>`;
+                    tooltipContent += `<div><span style="color: rgb(34, 197, 94);">●</span> Soil: ${Math.round(soilData)}%</div>`;
+                    tooltipContent += `<div><span style="color: rgb(251, 191, 36);">●</span> Light: ${Math.round(lightData)}%</div>`;
+                }
+
+                if (tempHumidityPoints.length > 0) {
+                    const index = tempHumidityPoints[0].index;
+                    const tempData = tempHumidityChart.data.datasets[0].data[index];
+                    const humidityData = tempHumidityChart.data.datasets[1].data[index];
+
+                    if (tooltipContent) tooltipContent += '<hr style="margin: 8px 0;">';
+                    tooltipContent += `<div><span style="color: rgb(239, 68, 68);">●</span> Temp: ${tempData.toFixed(1)}°C</div>`;
+                    tooltipContent += `<div><span style="color: rgb(59, 130, 246);">●</span> Humidity: ${Math.round(humidityData)}%</div>`;
+                }
+
+                showTooltip(event.clientX, event.clientY, tooltipContent);
+            }
+        }
+
+        // Function to show custom tooltip
+        function showTooltip(x, y, content) {
+            let tooltip = document.getElementById('sync-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = 'sync-tooltip';
+                tooltip.style.cssText = `
+                    position: fixed;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    pointer-events: none;
+                    z-index: 1000;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                `;
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.innerHTML = content;
+            tooltip.style.left = (x + 10) + 'px';
+            tooltip.style.top = (y - 10) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        // Function to hide tooltip
+        function hideTooltip() {
+            const tooltip = document.getElementById('sync-tooltip');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+            crosshairX = null;
+            isHovering = false;
+
+            // Update both charts to remove crosshair
+            if (soilLightChart) soilLightChart.update('none');
+            if (tempHumidityChart) tempHumidityChart.update('none');
+        }
 
         // Initialize charts
         function initCharts() {
@@ -137,12 +249,27 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: false // Disable default tooltips
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: false
                         }
+                    },
+                    onHover: (event, elements) => {
+                        if (elements.length > 0 || event.type === 'mousemove') {
+                            syncCrosshair(soilLightChart, tempHumidityChart, event.native);
+                        }
                     }
-                }
+                },
+                plugins: [crosshairPlugin]
             });
 
             const tempHumidityCtx = document.getElementById('tempHumidityChart').getContext('2d');
@@ -172,6 +299,15 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: false // Disable default tooltips
+                        }
+                    },
                     scales: {
                         y: {
                             type: 'linear',
@@ -195,7 +331,14 @@
                             },
                             beginAtZero: false
                         }
+                    },
+                    onHover: (event, elements) => {
+                        if (elements.length > 0 || event.type === 'mousemove') {
+                            syncCrosshair(tempHumidityChart, soilLightChart, event.native);
+                        }
                     }
+                },
+                plugins: [crosshairPlugin]
                 }
             });
         }
@@ -289,6 +432,13 @@
             initCharts();
             updateCharts();
             updateRecentData();
+
+            // Add mouse leave event listeners to both chart canvases
+            const soilLightCanvas = document.getElementById('soilLightChart');
+            const tempHumidityCanvas = document.getElementById('tempHumidityChart');
+
+            soilLightCanvas.addEventListener('mouseleave', hideTooltip);
+            tempHumidityCanvas.addEventListener('mouseleave', hideTooltip);
 
             // Auto-refresh every 30 seconds
             setInterval(() => {

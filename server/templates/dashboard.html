@@ -350,7 +350,9 @@
 
                 const labels = data.map(item => {
                     // Parse UTC timestamp and convert to local time
-                    const date = new Date(item.utc_timestamp);
+                    // Ensure we're parsing as UTC by appending 'Z' if not present
+                    const utcTimestamp = item.utc_timestamp.endsWith('Z') ? item.utc_timestamp : item.utc_timestamp + 'Z';
+                    const date = new Date(utcTimestamp);
                     const now = new Date();
                     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                     const itemDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -392,7 +394,8 @@
                     const row = document.createElement('tr');
 
                     // Parse UTC timestamp and convert to local time
-                    const date = new Date(item.utc_timestamp);
+                    const utcTimestamp = item.utc_timestamp.endsWith('Z') ? item.utc_timestamp : item.utc_timestamp + 'Z';
+                    const date = new Date(utcTimestamp);
 
                     row.innerHTML = `
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">

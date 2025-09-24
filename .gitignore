@@ -208,3 +208,7 @@ __marimo__/
 
 # Configuration files
 config.py
+
+# Database files
+garden_data.db
+*.db

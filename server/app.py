@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # Database configuration
-DATABASE = 'garden_data.db'
+DATABASE = os.environ.get('DATABASE', 'garden_data.db')
 
 def init_db():
     """Initialize the database with required tables"""

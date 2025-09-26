@@ -7,7 +7,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./data:/app/data
+      - garden_data:/app/data
     environment:
       - FLASK_ENV=production
       - DATABASE=/app/data/garden_data.db
